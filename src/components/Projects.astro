@@ -1,0 +1,197 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import Button from './Button.astro';
+import { projects } from '../data/projects';
+import { Image } from 'astro:assets';
+
+import beastMarkThumnail from '../images/beast-mark.png';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<style>
+	.carousel-item {
+		min-width: min(460px, calc(100vw - var(--spacing) * 12));
+		width: min(460px, calc(100vw - var(--spacing) * 12));
+	}
+</style>
+
+<section id='path' class='px-4 md:px-10 py-10'>
+	<div class='max-w-portfolio mx-auto'>
+		<div class='flex flex-wrap md:items-end flex-col md:flex-row gap-4 mb-10 mt-40'>
+			<p class='text-xs uppercase tracking-[.3em] text-accent-dim flex-1'>03 - {t('projects.projects')}</p>
+			<h2 class='text-4xl text-header font-light font-header flex-2'>{t('projects.header')}</h2>
+		</div>
+	</div>
+	<div id='slider' aria-roledescription='carousel' aria-label={t('projects.carousel_label')}>
+		{projects.length > 1 && (
+			<div class='max-w-portfolio mx-auto flex items-center gap-5 justify-end mb-10'>
+				<p class='text-xs tracking-[.3em]' aria-live='polite' aria-atomic="true"><span id='current-counter'>01</span> / <span>{projects.length.toString().padStart(2, '0')}</span></p>
+				<Button variant='border' text='' icon={{ name: 'arrow-left', position: 'left' }} aria-label={t('projects.prev_label')} id='prev-button' />
+				<Button variant='border' text='' icon={{ name: 'arrow-right', position: 'left' }} aria-label={t('projects.next_label')} id='next-button' />
+			</div>
+		)}
+		<div id='carousel-items' class={`flex gap-4 overflow-x-auto snap-mandatory snap-x relative scrollbar-none py-1 ${projects.length < 4 && ' max-w-portfolio mx-auto'}`}>
+			{
+				projects.map((project) => (
+					<a href={project.link} class='p-4 border border-header-dim flex flex-col gap-2 rounded-sm bg-bg-dim hover:border-accent-dim hover:bg-bg-accent-dim transition-colors snap-start carousel-item'>
+						<div class='aspect-3/2 mb-2 relative'>
+							<Image src={beastMarkThumnail} alt='wd' class='w-full h-full object-cover' />
+							<span class='absolute top-0 right-0 p-2 w-full bg-linear-to-b from-black to-transparent text-sm text-accent tracking-widest text-right'>{project.date.getFullYear().toString()}</span>
+						</div>
+						<h3 class='text-header font-header text-2xl'>{project.title[lang]}</h3>
+						<p class='font-header text-sm'>{project.description[lang]}</p>
+						<p class='text-xs uppercase flex gap-x-2'>
+							{project.tags.map((tag, i) => (
+								<>
+									{i > 0 && <span>·</span>}
+									<span>{tag[lang]}</span>
+								</>
+							))}
+						</p>
+					</a>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<script>
+	class Slider {
+		readonly slider: HTMLElement;
+		readonly scrollArea: HTMLElement | null;
+		readonly nextButton: HTMLElement | null;
+		readonly prevButton: HTMLElement | null;
+		readonly currentCounter: HTMLElement | null;
+		readonly slides: NodeListOf<HTMLElement>;
+		readonly resizeObserver: ResizeObserver;
+		readonly intersectionObserver: IntersectionObserver;
+
+		behavior: 'smooth' | 'auto';
+		isMotionReduced: boolean;
+		slideWidth: number;
+		visibleIndexes: Array<number>;
+        maxVisibleSlide: number;
+        minVisibleSlide: number;
+        firstIntersecting: boolean;
+
+		constructor(slider: HTMLElement) {
+			this.slider = slider;
+
+			this.scrollArea = this.slider?.querySelector('#carousel-items');
+			this.nextButton = this.slider?.querySelector('#next-button');
+			this.prevButton = this.slider?.querySelector('#prev-button');
+			this.currentCounter = this.slider?.querySelector('#current-counter');
+			this.slides = this.slider?.querySelectorAll('.carousel-item');
+
+			this.slideWidth = this.slides?.[0]?.offsetWidth || 0;
+			this.isMotionReduced = window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true;
+			this.behavior = this.isMotionReduced ? 'auto' : 'smooth';
+            this.visibleIndexes = [];
+            this.maxVisibleSlide = 0;
+            this.minVisibleSlide = 0;
+			this.firstIntersecting = true;
+
+			this.resizeObserver = new ResizeObserver((entries) => {
+				requestAnimationFrame(() => {
+					this.onResize();
+					this.onSlideChange();
+				});
+			});
+
+			this.intersectionObserver = new IntersectionObserver((entries) => {
+				if (this.firstIntersecting) {
+					for (const entry of entries) {
+						this.onIntersection(entry);
+					}
+					this.onSlideChange();
+					this.firstIntersecting = false;
+					return;
+				}
+
+                for (const entry of entries) {
+                    this.onIntersection(entry);
+                }
+			}, { root: this.scrollArea, threshold: 1 }); 
+
+			this.init();
+		}
+
+		init() {
+			if (!this.scrollArea) return;
+			this.nextButton?.addEventListener('click', this.onNextButtonClick.bind(this));
+			this.prevButton?.addEventListener('click', this.onPrevButtonClick.bind(this));
+            this.resizeObserver.observe(this.scrollArea);
+            this.slides.forEach(slide => {
+                this.intersectionObserver.observe(slide);
+            });
+			this.scrollArea?.addEventListener('scrollend', this.onScrollEnd.bind(this));
+		}
+
+		onNextButtonClick() {
+			this.scrollArea?.scrollBy({
+				left: this.slideWidth,
+				behavior: this.behavior,
+			});
+		}
+
+		onPrevButtonClick() {
+			this.scrollArea?.scrollBy({
+				left: -this.slideWidth,
+				behavior: this.behavior,
+			});
+		}
+
+		onResize() {
+			this.slideWidth = this.slides?.[0]?.offsetWidth || 0;
+		}
+
+        onIntersection(entry: IntersectionObserverEntry) {
+            const index = [...this.slides].findIndex(slide => slide === entry.target);
+            if (entry.isIntersecting) {
+                this.visibleIndexes.push(index);
+            } else {
+                const indexInVisible = this.visibleIndexes.indexOf(index);
+                if (indexInVisible > -1) {
+                    this.visibleIndexes.splice(indexInVisible, 1);
+                }
+            }
+        }
+
+		onSlideChange() {
+			if (!this.visibleIndexes.length) return;
+			const maxVisibleSlide = Math.max(...this.visibleIndexes);
+			const minVisibleSlide = Math.min(...this.visibleIndexes);
+
+            if (maxVisibleSlide !== this.maxVisibleSlide) {
+				this.maxVisibleSlide = maxVisibleSlide;
+				this.updateCounter();
+			}
+			
+			if (minVisibleSlide !== this.minVisibleSlide) {
+				this.minVisibleSlide = minVisibleSlide;
+				this.updateCounter();
+			}
+
+			if (this.maxVisibleSlide + 1 === this.slides.length && this.nextButton) this.nextButton.setAttribute('disabled', '');
+			if (this.maxVisibleSlide + 1 !== this.slides.length && this.nextButton) this.nextButton.removeAttribute('disabled');
+			if (this.minVisibleSlide + 1 === 1 && this.prevButton) this.prevButton.setAttribute('disabled', '');
+			if (this.minVisibleSlide + 1 !== 1 && this.prevButton) this.prevButton.removeAttribute('disabled');
+		}
+
+		onScrollEnd() {
+			this.onSlideChange();
+		}
+
+        updateCounter() {
+            if (!this.currentCounter) return;
+            this.currentCounter.textContent = (this.maxVisibleSlide + 1).toString().padStart(2, "0");
+        }
+	}
+
+	const slider: HTMLElement | null = document.querySelector('#slider');
+	if (slider) {
+		new Slider(slider);
+	}
+</script>

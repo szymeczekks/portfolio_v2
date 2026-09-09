@@ -1,0 +1,47 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { Icon } from 'astro-icon/components';
+
+interface Props extends HTMLAttributes<"button"> {
+    variant: 'border' | 'inline' | 'inline-header',
+    text?: string,
+    type?: 'button' | 'submit',
+    classes?: string[],
+    icon?: {
+        name: string,
+        position?: 'right' | 'left',
+    }
+}
+
+const {
+    variant,
+    text,
+    type = 'button',
+    classes = [],
+    icon,
+    ...rest
+} = Astro.props as Props;
+
+const commonStyles = ['enabled:cursor-pointer', 'disabled:cursor-not-allowed', 'uppercase', 'flex', 'gap-2', 'max-w-fit', 'text-xs', 'tracking-[.1em]'];
+const styles = {
+    'border' : [
+        'border', 'px-6', 'py-3', 'rounded-full', 'border-header-dim', 'text-header',
+        'enabled:hover:border-accent', 'enabled:hover:shadow-[0_0_20px]', 'enabled:hover:shadow-accent-dim',
+        'transition-all'
+    ],
+    'inline' : ['text-text', 'p-1'],
+    'inline-header' : ['text-header', 'p-1'],
+};
+---
+
+<button type={type} class:list={[...classes, ...commonStyles, ...styles[variant]]} {...rest}>
+    {icon && icon.position === 'left' && (
+        <Icon name={icon.name} size="15"/>
+    )}
+
+    {text && <span>{text}</span>}
+
+    {icon && icon.position === 'right' && (
+        <Icon name={icon.name} size="15"/>
+    )}
+</button>

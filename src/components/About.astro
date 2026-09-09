@@ -1,0 +1,55 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section id="about_me" class="px-4 md:px-10 py-10">
+    <div class="max-w-portfolio mx-auto w-full flex flex-col md:flex-row gap-4">
+        <p class="uppercase text-xs tracking-[.3em] flex-1 text-accent-dim">01 - {t('about_me.about_me')}</p>
+        <div class="flex flex-col gap-5 flex-2">
+            <p class="text-header md:text-2xl pb-4 md:pb-8 border-b border-header-dim font-header font-light">
+                {t('about_me.description')}
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <div class="text-xs flex-1">
+                    <p class="text-accent uppercase tracking-widest">
+                        Stack
+                    </p>
+                    <p class="mt-1 text-header">
+                        <span>React</span>
+                        <span class="px-1">·</span>
+                        <span>TS</span>
+                        <span class="px-1">·</span>
+                        <span>WebGL</span>
+                    </p>
+                </div>
+                <div class="text-xs flex-1">
+                    <p class="text-accent uppercase tracking-widest">
+                        {t('about_me.experience')}
+                    </p>
+                    <p class="mt-1 text-header">
+                        {t('about_me.experience_value')}
+                    </p>
+                </div>
+                <div class="text-xs flex-1">
+                    <p class="text-accent uppercase tracking-widest">
+                        {t('about_me.base')}
+                    </p>
+                    <p class="mt-1 text-header whitespace-nowrap">
+                        {t('about_me.base_value')}
+                    </p>
+                </div>
+                <div class="text-xs flex-1">
+                    <p class="text-accent uppercase tracking-widest">
+                        {t('about_me.availability')}
+                    </p>
+                    <p class="mt-1 text-header">
+                        {t('about_me.availability_value')}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

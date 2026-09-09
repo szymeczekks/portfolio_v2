@@ -1,0 +1,55 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+import Link from '../components/Link.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+
+<nav class="fixed top-0 z-1 w-full px-4 md:px-10">
+    <div class="flex max-w-portfolio mx-auto py-5 md:py-7 justify-between gap-10 font-text text-xs items-center">
+        <div class="backdrop-blur-lg absolute inset-0 -z-1"></div>
+        <div>
+            <Link variant="inline-header" href="#hero" text="S. M." />
+        </div>
+        <button 
+            class="md:hidden rounded-full border border-header-dim w-12 h-12 flex justify-center items-center flex-col gap-1.5 cursor-pointer peer group" 
+            aria-expanded="false"
+            aria-label={t('nav.open_menu')}
+            aria-controls="anchors"
+        >
+            <span class="h-px w-6 bg-header block transition-all group-aria-expanded:rotate-45 group-aria-expanded:translate-y-1.75"></span>
+            <span class="h-px w-6 bg-header block opacity-100 transition-all group-aria-expanded:translate-x-4 group-aria-expanded:opacity-0 duration-300"></span>
+            <span class="h-px w-6 bg-header block transition-all group-aria-expanded:-rotate-45 group-aria-expanded:-translate-y-1.75"></span>
+        </button>
+        <div class="hidden bg-bg-dim px-5 backdrop-blur-lg inset-0 fixed opacity-0 md:opacity-100 md:relative md:backdrop-blur-none md:px-0 md:bg-transparent md:block peer-aria-expanded:flex starting:peer-aria-expanded:opacity-0 peer-aria-expanded:opacity-100 transition-discrete transition-all easy-in-out duration-300 -z-1 items-center" id="anchors">
+            <ul class="flex-col md:flex-row flex gap-5 md:gap-10 md:tracking-[.2rem]">
+                <li class="font-header text-3xl md:uppercase md:font-text md:text-xs">
+                    <Link variant="inline" href="#about" text={t('nav.about')} />
+                </li>
+                <li class="font-header text-3xl md:uppercase md:font-text md:text-xs">
+                    <Link variant="inline" href="#path" text={t('nav.path')} />
+                </li>
+                <li class="font-header text-3xl md:uppercase md:font-text md:text-xs">
+                    <Link variant="inline" href="#projects" text={t('nav.projects')} />
+                </li>
+                <li class="font-header text-3xl md:uppercase md:font-text md:text-xs">
+                    <Link variant="inline" href="#contact" text={t('nav.contact')} />
+                </li>
+                <li class="block md:hidden text-sm mt-10">
+                    <p>53°09′N 16°44′E - Piła</p>
+                </li>
+            </ul>
+        </div>
+        <p class="hidden lg:block text-text">53°09′N 16°44′E</p>
+    </div>
+</nav>
+
+<script>
+    document.querySelectorAll('nav [aria-expanded]').forEach(button => {
+        button.addEventListener('click', () => {
+            button.setAttribute('aria-expanded', button.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+        });
+    });
+</script>

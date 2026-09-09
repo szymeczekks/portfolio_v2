@@ -1,0 +1,35 @@
+---
+import ButtonV2 from '../components/ButtonV2.astro';
+import Link from '../components/Link.astro';
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<footer class="border-t border-header-dim px-4 md:px-10 py-5">
+    <div class="max-w-portfolio mx-auto text-xs text-text font-text uppercase flex flex-col md:flex-row flex-wrap justify-between gap-5">
+        <p>
+           Copyright &copy; <span id="copyright"></span> | Szymon Mińko
+        </p>
+        <ul class="flex gap-5 tracking-[.3em]">
+            <li><a href="">GitHub</a></li>
+            <li><a href="">LinkedIn</a></li>
+        </ul>
+        <Link
+            href='#'
+            text={t('footer.back_to_top')}
+            variant='inline'
+            icon={{
+                name: 'chevron-up',
+                position: 'right'
+            }}
+        />
+    </div>
+</footer>
+
+<script>
+    const currentYear = new Date().getFullYear().toString();
+    const copyright =  document.querySelector('#copyright');
+    if (copyright) copyright.textContent = currentYear;
+</script>

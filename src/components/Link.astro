@@ -1,0 +1,46 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+    href: string,
+    text: string,
+    variant: 'border' | 'inline' | 'inline-header',
+    classes?: string[],
+    icon?: {
+        name: string,
+        position: 'right' | 'left',
+    }
+}
+
+const {
+    text,
+    href,
+    variant,
+    classes = [],
+    icon,
+    ...rest
+} = Astro.props as Props;
+
+const commonStyles = ['cursor-pointer', 'uppercase', 'flex', 'gap-2', 'max-w-fit', 'text-xs', 'tracking-[.1em]'];
+const styles = {
+    'border' : [
+        'border', 'px-6', 'py-3', 'rounded-full', 'border-header-dim', 'text-header',
+        'hover:border-accent', 'hover:shadow-[0_0_20px]', 'hover:shadow-accent-dim',
+        'transition-all'
+    ],
+    'inline' : ['text-text', 'py-1'],
+    'inline-header' : ['text-header', 'py-1'],
+};
+---
+
+<a href={href} class:list={[...classes, ...commonStyles, ...styles[variant]]} {...rest}>
+    {icon && icon.position === 'left' && (
+        <Icon name={icon.name} size="15"/>
+    )}
+
+    <span>{text}</span>
+
+    {icon && icon.position === 'right' && (
+        <Icon name={icon.name} size="15"/>
+    )}
+</a>

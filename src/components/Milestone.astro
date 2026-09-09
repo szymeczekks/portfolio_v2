@@ -1,0 +1,25 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+import type { Milestone } from "../data/milestones";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const data = Astro.props as Milestone;
+const startYear = data.start.getFullYear().toString();
+const endYear = data.end?.getFullYear().toString();
+---
+
+
+<div class='flex flex-wrap flex-col md:flex-row gap-4'>
+	<div class='flex-1 flex flex-col items-center'>
+		<span class='w-2 h-2 rounded-full bg-header block shadow-[0_0_15px_2px] shadow-header mt-2'></span>
+		<span class='block w-px h-full bg-linear-to-b to-transparent from-header-dim'></span>
+	</div>
+	<div class='flex-2'>
+		<p class='text-accent text-xs tracking-[.3em] uppercase'>{startYear} - {!endYear ? t('milestone.now') : endYear} <span class='text-text'>{data.badge[lang]}</span></p>
+		<h3 class='font-header text-header text-2xl mt-2'>{data.title[lang]}</h3>
+		<p class='mt-2 text-xs'>{data.place[lang]}</p>
+		<p class='mt-2 font-header'>{data.description[lang]}</p>
+	</div>
+</div>

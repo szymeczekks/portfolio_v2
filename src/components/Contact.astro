@@ -1,0 +1,190 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import Button from './Button.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section id='path' class='px-4 md:px-10 py-10'>
+	<div class='max-w-portfolio mx-auto'>
+		<div class='flex flex-wrap md:items-start flex-col md:flex-row gap-4 mb-10 mt-40'>
+            <div class="flex-1 flex flex-col gap-4">
+                <p class='text-xs uppercase tracking-[.3em] text-accent-dim flex-1'>03 - {t('contact.contact')}</p>
+                <h2 class='text-4xl text-header font-light font-header flex-2'>{t('contact.header')}</h2>
+                <p class='text font text-text font-header flex-1'>{t('contact.subheader')}</p>
+                <a href="mailto:szymon@minko.dev" class="text-header">szymon@minko.dev</a>
+            </div>
+            <div class="flex-2">
+                <form id="form" class="flex flex-col gap-8" novalidate>
+                    <div class="flex flex-col gap-4">
+                        <label class="uppercase tracking-[.3em] text-xs" for="name">{t('contact.name_label')}*</label>
+                        <input
+                            class="border-b border-header-dim py-2 outline-none focus:border-accent text-header font-header aria-invalid:border-error user-valid:border-success"
+                            required
+                            type="text"
+                            name="name"
+                            id="name"
+                            placeholder={t('contact.name_placeholder')}
+                            autocomplete="name"
+                            aria-describedby="error_name"
+                        >
+                        <p role="alert" id="error_name" class="text-xs text-error"></p>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <label class="uppercase tracking-[.3em] text-xs" for="email">{t('contact.email_label')}*</label>
+                        <input
+                            class="border-b border-header-dim py-2 outline-none focus:border-accent text-header font-header aria-invalid:border-error user-valid:border-success"
+                            required
+                            type="email"
+                            name="email"
+                            id="email"
+                            placeholder={t('contact.email_placeholder')}
+                            autocomplete="email"
+                            aria-describedby="error_email"
+                        >
+                        <p role="alert" id="error_email" class="text-xs text-error"></p>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <label class="uppercase tracking-[.3em] text-xs" for="message">{t('contact.message_label')}*</label>
+                        <textarea 
+                            class="border-b border-header-dim py-2 outline-none focus:border-accent text-header font-header aria-invalid:border-error user-valid:border-success" 
+                            required
+                            name="message" 
+                            id="message"
+                            rows="5"
+                            placeholder={t('contact.message_placeholder')}
+                            aria-describedby="error_message"
+                        ></textarea>
+                        <p role="alert" id="error_message" class="text-xs text-error"></p>
+                    </div>
+                    <div>
+                        <Button
+                            variant='border'
+                            text={t('contact.submit')}
+                            type='submit'
+                            icon={{
+                                name: 'send',
+                                position: 'right'
+                            }}
+                            id='submit'
+                        />
+                    </div>
+                </form>
+            </div>
+		</div>
+	</div>
+</section>
+
+<script>
+    import { getLangFromUrl, useTranslations } from '../i18n/utils';
+    const lang = getLangFromUrl(new URL(window.location.href));
+    const t = useTranslations(lang);
+
+    class Input {
+        readonly input: HTMLInputElement;
+        readonly errorMessage: HTMLElement | null;
+        readonly validityKeys: (keyof ValidityState)[] = [
+            'valueMissing',
+            'patternMismatch',
+            'typeMismatch',
+            'badInput',
+            'customError',
+            'rangeOverflow',
+            'rangeUnderflow',
+            'stepMismatch',
+            'tooLong',
+            'tooShort',
+        ];
+        hasFirstBlur: boolean;
+
+        constructor(input: HTMLInputElement) {
+            this.input = input;
+
+            this.errorMessage = document.querySelector(`#error_${this.input.id}`);
+            this.hasFirstBlur = false;
+
+            this.init();
+        }
+
+        init() {
+            this.input.addEventListener('blur', () => {
+                if (!this.hasFirstBlur) this.hasFirstBlur = true;
+                this.input.checkValidity();
+                this.validate(this.input.validity);
+            });
+
+            this.input.addEventListener('input', () => {
+                if (!this.hasFirstBlur) return;
+                this.validate(this.input.validity);
+            });
+        }
+
+        validate(validityState: ValidityState) {
+            if (validityState.valid) {
+                this.input.removeAttribute('aria-invalid');
+            }
+            if (validityState.valid && this.errorMessage) {
+                this.errorMessage.textContent = '';
+            }
+
+            const invalidKeys: (keyof ValidityState)[] = [];
+
+            for (const validityKey of this.validityKeys) {
+                if (validityState[validityKey]) {
+                    invalidKeys.push(validityKey);
+                }
+            }
+
+            if (!invalidKeys.length) return;
+
+            this.input.setAttribute('aria-invalid', 'true');
+
+            if (this.errorMessage) {
+                this.errorMessage.textContent = t(`contact.errors.${invalidKeys[0]}`) || '';
+            }
+        }
+
+        isValid() {
+            return this.input.validity.valid;
+        }
+    }
+
+    const name = document.querySelector<HTMLInputElement>('#name');
+    const email = document.querySelector<HTMLInputElement>('#email');
+    const message = document.querySelector<HTMLInputElement>('#message');
+    const form = document.querySelector('#form');
+    const inputs: Input[] = [];
+
+    if (name && email && message) {
+        inputs.push(new Input(name));
+        inputs.push(new Input(email));
+        inputs.push(new Input(message));
+    }
+
+
+    form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let firstInvalid = false;
+        for (const input of inputs) {
+            input.validate(input.input.validity);
+            if (!input.isValid() && !firstInvalid) {
+                input.input.focus();
+                firstInvalid = true;
+            }
+        }
+        
+        if (firstInvalid) return;
+        
+        form.setAttribute('aria-busy', 'true');
+        try {
+            console.log('wysyłam dane...');
+            /* fetch na backend gdy będzie gotowy */
+        } catch (error) {
+            console.error(error);
+        } finally {
+            form.removeAttribute('aria-busy');
+        }
+    });
+    
+</script>

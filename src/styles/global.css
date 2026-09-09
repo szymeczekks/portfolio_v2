@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --container-portfolio: 1300px;
+  --color-header: rgb(244, 244, 246);
+  --color-header-dim: rgb(244, 244, 246, .2);
+  --color-text: rgb(165, 165, 173);
+  --color-bg-dim: rgba(0, 0, 0, .2);
+  --color-bg-accent-dim: rgba(194, 163, 122, .05);
+  --color-accent: rgb(194, 163, 122);
+  --color-accent-dim: rgb(194, 163, 122, .5);
+  --color-error: rgb(219 73 73);
+  --color-success: rgb(83 205 156);
+
+  --animate-scroll: scroll 2s ease-in-out infinite;
+
+  @keyframes scroll {
+    0% {
+      background-position: 0% 200%;
+    }
+
+    50% {
+      background-position: 0% 200%;
+    }
+
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+}
+
+@theme inline {
+  --font-header: var(--font-space-grotesk);
+  --font-text: var(--font-jetbrains-mono);
+}
+
+@media(max-width: 767px) {
+  body:has([aria-expanded="true"]) {
+    overflow: hidden;
+  }
+}

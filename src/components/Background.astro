@@ -1,0 +1,276 @@
+<style>
+</style>
+
+<canvas id="background" class="block fixed t-0 -z-1"></canvas>
+
+<script>
+    interface Star {
+        x: number;
+        y: number;
+        radius: number;
+        depth: number;
+        alpha: number;
+        phase: number;
+        pulses: boolean;
+        pulseSpeed: number;
+        shadow: boolean;
+    };
+
+    interface ShootingStar {
+        birthTime: number;
+        maxLifeTime: number;
+        lifeTime: number;
+        speed: number;
+        radius: number;
+        direction: Point;
+        position: Point;
+    }
+
+    interface Viewport {
+        width: number,
+        height: number,
+        marginLeft: number,
+        marginRight: number,
+        marginTop: number,
+        marginBottom: number,
+    };
+
+    interface Point {
+        x: number,
+        y: number
+    };
+
+    const SCROLL_FACTOR = 0.16;
+    const MAX_STAR_RADIUS = 2.6;
+    const SMOOTH_FACTOR = 0.1;
+    const MOUSE_SMOOTH_STRENGTH = 50;
+    const VIEWPORT_MARGIN = 0.1;
+    const canvas = document.querySelector<HTMLCanvasElement>('#background');
+
+    function init() {
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const viewport: Viewport = {
+            height: window.innerHeight,
+            width: innerWidth,
+            marginLeft: innerWidth * VIEWPORT_MARGIN,
+            marginRight: innerWidth * (1 - VIEWPORT_MARGIN),
+            marginTop: window.innerHeight * VIEWPORT_MARGIN,
+            marginBottom: window.innerHeight * (1 - VIEWPORT_MARGIN),
+        };
+
+        const mouseTarget: Point = { x: 0, y: 0 };
+        const mouseSmooth: Point = { x: 0, y: 0 };
+        const scrollTarget: Point = { x: 0, y: window.scrollY };
+        let scrollSmooth: Point = { x: 0, y: 0 };
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = viewport.width * dpr;
+        canvas.height = viewport.height * dpr;
+        canvas.style.height = `${viewport.height}px`;
+        canvas.style.width = `${viewport.width}px`;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseTarget.x = (e.clientX / viewport.width) * 2 - 1;
+            mouseTarget.y = (e.clientY / viewport.height) * 2 - 1;
+        });
+
+        window.addEventListener('scroll', () => {
+            scrollTarget.y = window.scrollY;
+        });
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const shootingStar: ShootingStar = {
+            birthTime: 1,
+            lifeTime: 0,
+            maxLifeTime: 1,
+            speed: 600,
+            radius: 3,
+            direction: { x: 0, y: 0 },
+            position: { x: 0, y: 0 }
+        };
+
+        const stars = createStars(viewport);
+        window.requestAnimationFrame(() => draw(viewport, ctx, stars, shootingStar, mouseTarget, mouseSmooth, scrollTarget, scrollSmooth));
+    }
+
+    function draw(
+        viewport:Viewport,
+        ctx: CanvasRenderingContext2D,
+        stars: Star[],
+        shootingStar: ShootingStar,
+        mouseTarget: Point,
+        mouseSmooth: Point,
+        scrollTarget: Point,
+        scrollSmooth: Point
+    ) {
+        mouseSmooth.x += (mouseTarget.x - mouseSmooth.x) * SMOOTH_FACTOR;
+        mouseSmooth.y += (mouseTarget.y - mouseSmooth.y) * SMOOTH_FACTOR;
+        scrollSmooth.y += (scrollTarget.y - scrollSmooth.y) * SMOOTH_FACTOR;
+
+        ctx.clearRect(0, 0, viewport.width, viewport.height);
+
+        for (const star of stars) {
+            const starX = star.x + mouseSmooth.x * star.depth * MOUSE_SMOOTH_STRENGTH;
+            const starY = (((star.y - (scrollSmooth.y * SCROLL_FACTOR) + mouseSmooth.y * star.depth * MOUSE_SMOOTH_STRENGTH) % viewport.height) + viewport.height) % viewport.height;
+            const alpha = star.pulses ? getPulsingAlpha(star.pulseSpeed, star.phase, star.alpha) : star.alpha;
+
+            ctx.beginPath();
+            ctx.arc(starX, starY, star.radius, Math.PI * 2, 0);
+            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+            ctx.fill();
+            
+            if (star.shadow) {
+                const g = ctx.createRadialGradient(starX, starY, 0, starX, starY, star.radius * 5.5);
+                g.addColorStop(0, 'rgba(255,255,255,' + (alpha * .5) + ')');
+                g.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(starX, starY, star.radius * 5.5, Math.PI * 2, 0);
+                ctx.fill();
+            }
+
+        }
+
+        if (performance.now() / 1000 > shootingStar.birthTime) {
+            drawShootingStar(ctx, viewport, shootingStar);
+        }
+
+        window.requestAnimationFrame(() => draw(viewport, ctx, stars, shootingStar, mouseTarget, mouseSmooth, scrollTarget, scrollSmooth));
+    }
+
+    function createStars(viewport: Viewport) {
+        const stars: Star[] = [];
+        const perpUnit = perpendicularUnit(viewport);
+        const scatterRadius = viewport.height * 0.17;
+        for (let i = 0; i < 1000; i++) {
+            const r = getStarRadius();
+            const point = isDiagonal() ? diagonalPoint(viewport, perpUnit, scatterRadius) : randomPoint(viewport);
+            const depth = r / MAX_STAR_RADIUS;
+            const alpha = getStarAlpha(depth);
+
+            stars.push({
+                x: point.x,
+                y: point.y,
+                radius: r,
+                alpha: alpha,
+                depth: depth,
+                pulses: depth > .3,
+                phase: Math.random() * 100,
+                pulseSpeed: 2,
+                shadow: depth > .9
+            });
+        }
+
+        return stars;
+    }
+
+    function getStarRadius(): number {
+        const t = Math.random() ** 10;
+        return 0.3 + t * (MAX_STAR_RADIUS);
+    }
+
+    function getStarAlpha(depth: number): number {
+        const max = 1;
+        const min = 0.5;
+        return min + (1 - depth) * (max - min);
+    }
+
+    function getPulsingAlpha(speed: number, phase: number, maxAlpha: number): number {
+        const pulseModulation = ((Math.sin((performance.now() / 1000) * speed + phase)) + 1) / 2;
+        return 0.1 + pulseModulation * (maxAlpha - 0.1);
+    }
+
+    function isDiagonal(): boolean {
+        return Math.random() < 0.6;
+    }
+
+    function diagonalPoint(viewport: Viewport, perpUnit: Point, scatterRadius: number): Point {
+        const g = gaussianOffset();
+        const t = Math.random() * 1;
+        const x = 0 + t * viewport.width;
+        const y = viewport.height + t * (-viewport.height);
+        return {
+            x: x + g * scatterRadius * perpUnit.x,
+            y: y + g * scatterRadius * perpUnit.y
+        };
+    }
+
+    function randomPoint(viewport: Viewport): Point {
+        return {
+            x: Math.random() * viewport.width,
+            y: Math.random() * viewport.height
+        }
+    }
+
+    function perpendicularUnit(viewport: Viewport): Point {
+        const perp = {
+            x: viewport.height,
+            y: viewport.width
+        }
+
+        const length = Math.sqrt(perp.x**2 + perp.y**2);
+        return {
+            x: perp.x / length,
+            y: perp.y / length
+        }
+    }
+
+    function gaussianOffset(): number {
+        return (Math.random() + Math.random() + Math.random() + Math.random() - 2) / 2;
+    }
+
+    function drawShootingStar(ctx: CanvasRenderingContext2D, viewport: Viewport, shootingStar: ShootingStar) {
+        if ( !shootingStar.lifeTime ) {
+            randomShootingStar(shootingStar, viewport);
+        }
+        const now = performance.now() / 1000;
+
+        shootingStar.lifeTime = now - shootingStar.birthTime;
+
+        if (shootingStar.lifeTime >= shootingStar.maxLifeTime) {
+            shootingStar.lifeTime = 0;
+            shootingStar.birthTime = now + 2;
+            return;
+        }
+
+        const starX = shootingStar.position.x + (shootingStar.speed * shootingStar.lifeTime) * shootingStar.direction.x;
+        const starY = shootingStar.position.y + (shootingStar.speed * shootingStar.lifeTime) * shootingStar.direction.y;
+        const alpha = getShootingStarFade(shootingStar.lifeTime / shootingStar.maxLifeTime);
+
+        ctx.beginPath();
+        ctx.arc(starX, starY, shootingStar.radius, Math.PI * 2, 0);
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.fill();
+
+        const g = ctx.createRadialGradient(starX, starY, 0, starX, starY, shootingStar.radius * 5.5);
+        g.addColorStop(0, 'rgba(255,255,255,' + (alpha * .5) + ')');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(starX, starY, shootingStar.radius * 5.5, Math.PI * 2, 0);
+        ctx.fill();
+    }
+
+    function randomShootingStar(shootingStar: ShootingStar, viewport: Viewport) {
+        const randomX = viewport.marginLeft + Math.random() * (viewport.marginRight - viewport.marginLeft);
+        const randomY = viewport.marginTop + Math.random() * (viewport.marginBottom - viewport.marginTop);
+        const randomAngle = Math.random() * 2 * Math.PI;
+        const vx = 1 * Math.cos(randomAngle);
+        const vy = 1 * Math.sin(randomAngle);
+
+        shootingStar.position.x = randomX;
+        shootingStar.position.y = randomY;
+        shootingStar.direction.x = vx;
+        shootingStar.direction.y = vy;
+    }
+
+    function getShootingStarFade(t: number): number {
+        return Math.sin(Math.PI * t) ** (1 / 4);
+    }
+
+    init();
+</script>
