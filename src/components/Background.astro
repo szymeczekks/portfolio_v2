@@ -64,13 +64,20 @@
 		if (!ctx) return;
 
 		const offscreenCanvas: HTMLCanvasElement = document.createElement('canvas');
-		const offscreenCtx: CanvasRenderingContext2D = offscreenCanvas.getContext('2d');
+		if (!offscreenCanvas) return;
+		const offscreenCtx = offscreenCanvas.getContext('2d');
+		if (!offscreenCtx) return;
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-		offscreenCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-		let viewport: Viewport = getViewportData();
+		let viewport: Viewport = {
+			height: 0,
+			width: 0,
+			marginBottom: 0,
+			marginLeft: 0,
+			marginRight: 0,
+			marginTop: 0,
+		};
+		setViewportData(viewport);
 		let canvasSizes: CanvasSizes = getCanvasSizes(viewport, dpr);
 		let stars = createStars(viewport);
 
@@ -81,6 +88,8 @@
 
 		setCanvasSizes(canvas, canvasSizes);
 		setCanvasSizes(offscreenCanvas, canvasSizes);
+		offscreenCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 		drawCosmicDust(viewport, offscreenCtx);
 
 		window.addEventListener('mousemove', (e) => {
@@ -92,15 +101,17 @@
 			scrollTarget.y = window.scrollY;
 		});
 
-		window.addEventListener('resize', () => {
-            /* debounce */
-			viewport = getViewportData();
+		window.addEventListener('resize', debounce(() => {
+			setViewportData(viewport);
+			canvasSizes = getCanvasSizes(viewport, dpr);
 			setCanvasSizes(canvas, canvasSizes);
 			setCanvasSizes(offscreenCanvas, canvasSizes);
+			offscreenCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 			drawCosmicDust(viewport, offscreenCtx);
 			stars.length = 0;
 			stars.push(...createStars(viewport));
-		});
+		}, 100));
 
 		const shootingStar: ShootingStar = {
 			birthTime: getBirthTime(performance.now() / 1000),
@@ -116,15 +127,13 @@
 		window.requestAnimationFrame(() => draw(viewport, ctx, stars, shootingStar, mouseTarget, mouseSmooth, scrollTarget, scrollSmooth, offscreenCanvas));
 	}
 
-	function getViewportData(): Viewport {
-		return {
-			height: window.innerHeight,
-			width: innerWidth,
-			marginLeft: innerWidth * VIEWPORT_MARGIN,
-			marginRight: innerWidth * (1 - VIEWPORT_MARGIN),
-			marginTop: window.innerHeight * VIEWPORT_MARGIN,
-			marginBottom: window.innerHeight * (1 - VIEWPORT_MARGIN),
-		};
+	function setViewportData(viewport: Viewport) {
+		viewport.height = window.innerHeight;
+		viewport.width = innerWidth;
+		viewport.marginLeft = innerWidth * VIEWPORT_MARGIN;
+		viewport.marginRight = innerWidth * (1 - VIEWPORT_MARGIN);
+		viewport.marginTop = window.innerHeight * VIEWPORT_MARGIN;
+		viewport.marginBottom = window.innerHeight * (1 - VIEWPORT_MARGIN);
 	}
 
 	function getCanvasSizes(viewport: Viewport, dpr: number): CanvasSizes {
@@ -142,10 +151,10 @@
 	}
 
 	function setCanvasSizes(ctx: HTMLCanvasElement, sizes: CanvasSizes) {
-		ctx.width = sizes.physicWidth;
-		ctx.height = sizes.physicHeight;
 		ctx.style.height = `${sizes.logicHeight}px`;
 		ctx.style.width = `${sizes.logicWidth}px`;
+		ctx.width = sizes.physicWidth;
+		ctx.height = sizes.physicHeight;
 	}
 
 	function draw(viewport: Viewport, ctx: CanvasRenderingContext2D, stars: Star[], shootingStar: ShootingStar, mouseTarget: Point, mouseSmooth: Point, scrollTarget: Point, scrollSmooth: Point, offscreenCanvas: HTMLCanvasElement) {
@@ -381,6 +390,19 @@
 
 	function getBirthTime(from: number): number {
 		return from + (MIN_BIRTH_TIME + Math.random() * (MAX_BIRTH_TIME - MIN_BIRTH_TIME));
+	}
+
+	function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number): (...args: Parameters<F>) => void {
+		let timeout: ReturnType<typeof setTimeout> | null = null;
+
+		return function (this: ThisParameterType<F>, ...args: Parameters<F>) {
+			if (timeout !== null) {
+				clearTimeout(timeout);
+			}
+			timeout = setTimeout(() => {
+				func.apply(this, args);
+			}, waitFor);
+		};
 	}
 
 	init();
