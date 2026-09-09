@@ -23,10 +23,10 @@ const t = useTranslations(lang);
             <span class="h-px w-6 bg-header block opacity-100 transition-all group-aria-expanded:translate-x-4 group-aria-expanded:opacity-0 duration-300"></span>
             <span class="h-px w-6 bg-header block transition-all group-aria-expanded:-rotate-45 group-aria-expanded:-translate-y-1.75"></span>
         </button>
-        <div class="hidden bg-bg-dim px-5 backdrop-blur-lg inset-0 fixed opacity-0 md:opacity-100 md:relative md:backdrop-blur-none md:px-0 md:bg-transparent md:block peer-aria-expanded:flex starting:peer-aria-expanded:opacity-0 peer-aria-expanded:opacity-100 transition-discrete transition-all easy-in-out duration-300 -z-1 items-center" id="anchors">
+        <div class="hidden bg-bg-dim px-5 backdrop-blur-lg inset-0 fixed opacity-0 md:opacity-100 md:relative md:backdrop-blur-none md:px-0 md:bg-transparent md:block peer-aria-expanded:flex starting:peer-aria-expanded:opacity-0 peer-aria-expanded:opacity-100 transition-discrete transition-all easy-in-out duration-300 -z-1 md:z-1 items-center" id="anchors">
             <ul class="flex-col md:flex-row flex gap-5 md:gap-10 md:tracking-[.2rem]">
                 <li class="font-header text-3xl md:uppercase md:font-text md:text-xs">
-                    <Link variant="inline" href="#about" text={t('nav.about')} />
+                    <Link variant="inline" href="#about_me" text={t('nav.about')} />
                 </li>
                 <li class="font-header text-3xl md:uppercase md:font-text md:text-xs">
                     <Link variant="inline" href="#path" text={t('nav.path')} />
