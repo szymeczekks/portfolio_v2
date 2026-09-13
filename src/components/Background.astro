@@ -130,8 +130,7 @@
 
 	function setViewportData(viewport: Viewport) {
 		if (
-			(innerHeight < viewport.height && viewport.height - innerHeight < 100) ||
-			(innerWidth < viewport.width && viewport.width - innerWidth < 100)
+			(innerHeight <= viewport.height && viewport.height - innerHeight < 100)
 		) return false;
 
 		viewport.height = innerHeight;
