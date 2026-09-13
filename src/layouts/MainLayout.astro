@@ -4,8 +4,9 @@ import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import { Font } from "astro:assets";
 import Background from "../components/Background.astro";
+import Cursor from "../components/Cursor.astro";
 ---
-
+<!-- cursor-none motion-reduce:cursor-auto -->
 <html lang={Astro.currentLocale} class="motion-safe:scroll-smooth">
 	<head>
 		<meta charset="utf-8" />
@@ -22,5 +23,6 @@ import Background from "../components/Background.astro";
         <Nav></Nav>
         <slot/>
         <Footer></Footer>
+		<Cursor/>
 	</body>
 </html>

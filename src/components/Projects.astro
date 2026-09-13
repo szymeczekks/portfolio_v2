@@ -35,7 +35,7 @@ const t = useTranslations(lang);
 		<div id='carousel-items' class={`flex gap-4 overflow-x-auto snap-mandatory snap-x relative scrollbar-none py-1 ${projects.length < 4 && ' max-w-portfolio mx-auto'}`}>
 			{
 				projects.map((project) => (
-					<a href={project.link} class='p-4 border border-header-dim flex flex-col gap-2 rounded-sm bg-bg-dim hover:border-accent-dim hover:bg-bg-accent-dim transition-colors snap-start carousel-item'>
+					<a href={project.link} class='p-4 border border-header-dim flex flex-col gap-2 rounded-sm bg-bg-dim hover:border-accent-dim hover:bg-bg-accent-dim transition-colors snap-start carousel-item' data-cursor="cta">
 						<div class='aspect-3/2 mb-2 relative'>
 							<Image src={beastMarkThumnail} alt='wd' class='w-full h-full object-cover' />
 							<span class='absolute top-0 right-0 p-2 w-full bg-linear-to-b from-black to-transparent text-sm text-accent tracking-widest text-right'>{project.date.getFullYear().toString()}</span>

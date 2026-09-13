@@ -47,9 +47,14 @@ const t = useTranslations(lang);
 </nav>
 
 <script>
-    document.querySelectorAll('nav [aria-expanded]').forEach(button => {
-        button.addEventListener('click', () => {
-            button.setAttribute('aria-expanded', button.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+    const burger = document.querySelector('nav [aria-expanded]');
+    if (burger) {
+        burger.addEventListener('click', () => {
+            burger.setAttribute('aria-expanded', burger.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
         });
-    });
+    
+        document.querySelectorAll('nav li a').forEach(link => {
+            link.addEventListener('click', () => burger.setAttribute('aria-expanded', 'false'))
+        });
+    }
 </script>

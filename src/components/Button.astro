@@ -22,7 +22,7 @@ const {
     ...rest
 } = Astro.props as Props;
 
-const commonStyles = ['enabled:cursor-pointer', 'disabled:cursor-not-allowed', 'uppercase', 'flex', 'gap-2', 'max-w-fit', 'text-xs', 'tracking-[.1em]'];
+const commonStyles = ['disabled:cursor-not-allowed', 'uppercase', 'flex', 'gap-2', 'max-w-fit', 'text-xs', 'tracking-[.1em]'];
 const styles = {
     'border' : [
         'border', 'px-6', 'py-3', 'rounded-full', 'border-header-dim', 'text-header',
@@ -32,9 +32,11 @@ const styles = {
     'inline' : ['text-text', 'p-1'],
     'inline-header' : ['text-header', 'p-1'],
 };
+
+const cursor: 'link' | 'cta' = variant === 'border' ? 'cta' : 'link';
 ---
 
-<button type={type} class:list={[...classes, ...commonStyles, ...styles[variant]]} {...rest}>
+<button type={type} data-cursor={cursor} class:list={[...classes, ...commonStyles, ...styles[variant]]} {...rest}>
     {icon && icon.position === 'left' && (
         <Icon name={icon.name} size="15"/>
     )}

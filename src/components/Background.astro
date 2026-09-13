@@ -102,15 +102,16 @@
 		});
 
 		window.addEventListener('resize', debounce(() => {
-			setViewportData(viewport);
-			canvasSizes = getCanvasSizes(viewport, dpr);
-			setCanvasSizes(canvas, canvasSizes);
-			setCanvasSizes(offscreenCanvas, canvasSizes);
-			offscreenCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-			drawCosmicDust(viewport, offscreenCtx);
-			stars.length = 0;
-			stars.push(...createStars(viewport));
+			if (setViewportData(viewport)) {
+				canvasSizes = getCanvasSizes(viewport, dpr);
+				setCanvasSizes(canvas, canvasSizes);
+				setCanvasSizes(offscreenCanvas, canvasSizes);
+				offscreenCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+				drawCosmicDust(viewport, offscreenCtx);
+				stars.length = 0;
+				stars.push(...createStars(viewport));
+			}
 		}, 100));
 
 		const shootingStar: ShootingStar = {
@@ -128,12 +129,18 @@
 	}
 
 	function setViewportData(viewport: Viewport) {
-		viewport.height = window.innerHeight;
+		if (
+			(innerHeight < viewport.height && viewport.height - innerHeight < 100) ||
+			(innerWidth < viewport.width && viewport.width - innerWidth < 100)
+		) return false;
+
+		viewport.height = innerHeight;
 		viewport.width = innerWidth;
 		viewport.marginLeft = innerWidth * VIEWPORT_MARGIN;
 		viewport.marginRight = innerWidth * (1 - VIEWPORT_MARGIN);
-		viewport.marginTop = window.innerHeight * VIEWPORT_MARGIN;
-		viewport.marginBottom = window.innerHeight * (1 - VIEWPORT_MARGIN);
+		viewport.marginTop = innerHeight * VIEWPORT_MARGIN;
+		viewport.marginBottom = innerHeight * (1 - VIEWPORT_MARGIN);
+		return true;
 	}
 
 	function getCanvasSizes(viewport: Viewport, dpr: number): CanvasSizes {

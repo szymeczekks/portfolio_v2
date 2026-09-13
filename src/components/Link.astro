@@ -31,9 +31,11 @@ const styles = {
     'inline' : ['text-text', 'py-1'],
     'inline-header' : ['text-header', 'py-1'],
 };
+const cursor: 'link' | 'cta' = variant === 'border' ? 'cta' : 'link';
+
 ---
 
-<a href={href} class:list={[...classes, ...commonStyles, ...styles[variant]]} {...rest}>
+<a href={href} data-cursor={cursor} class:list={[...classes, ...commonStyles, ...styles[variant]]} {...rest}>
     {icon && icon.position === 'left' && (
         <Icon name={icon.name} size="15"/>
     )}

@@ -1,0 +1,90 @@
+<style>
+
+</style>
+
+<div id="cursor_dot" class="w-1.5 aspect-square bg-header rounded-full fixed top-50 left-50 z-100 pointer-events-none pointer-coarse:hidden motion-reduce:hidden"></div>
+<div id="cursor_ring" class="aspect-square border border-text fixed top-50 left-50 z-100 rounded-full pointer-events-none pointer-coarse:hidden motion-reduce:hidden"></div>
+
+<script>
+    interface Point {
+        x: number,
+        y: number
+    };
+
+    interface Ring extends Point {
+        element: HTMLElement,
+        width: number,
+        baseWidth: number,
+    }
+
+    interface Cursor extends Point {
+        factor: number
+    }
+
+    const ring: HTMLElement | null = document.querySelector('#cursor_ring');
+    const dot: HTMLElement | null = document.querySelector('#cursor_dot');
+    const cursor: Cursor = { x: 0, y: 0, factor: 1 };
+
+    if (dot && window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        handleDotMove(dot, cursor);
+    }
+
+    if (ring && window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        handleRing(ring, cursor);
+    }
+
+    
+    function handleDotMove(dot: HTMLElement, cursor: Cursor) {
+        const dotSizes: DOMRect = dot.getBoundingClientRect();
+        const radius: number = dotSizes.width / 2;
+        window.addEventListener('mousemove', (e) => {
+            const target: HTMLElement = e.target as HTMLElement;
+            const factor = !target ? 1 : getCursorFactor(target);
+
+            cursor.x = e.x;
+            cursor.y = e.y;
+            cursor.factor = factor;
+
+            const x: number = e.x - radius;
+            const y: number = e.y - radius;
+
+            dot.style.left = `${x}px`;
+            dot.style.top = `${y}px`;
+        });
+    }
+
+    function handleRing(ringElement: HTMLElement, cursor: Cursor) {
+        const ringRect: DOMRect = ringElement.getBoundingClientRect();
+        const ring: Ring = {
+            x: 0,
+            y: 0,
+            width: ringRect.width,
+            baseWidth: 40,
+            element: ringElement
+        };
+
+        requestAnimationFrame(() => moveRing(ring, cursor));
+    }
+
+    function moveRing(ring: Ring, cursor: Cursor) {
+        ring.x += (cursor.x - ring.x) * 0.1;
+        ring.y += (cursor.y - ring.y) * 0.1;
+        ring.width += ((ring.baseWidth * cursor.factor) - ring.width) * 0.1;
+        
+        const radius = ring.width / 2;
+        const x: number = ring.x - radius;
+        const y: number = ring.y - radius;
+        
+        ring.element.style.left = `${x}px`;
+        ring.element.style.top = `${y}px`;
+        ring.element.style.width = `${ring.width}px`;
+
+        requestAnimationFrame(() => moveRing(ring, cursor));
+    }
+
+    function getCursorFactor(target: HTMLElement): number {
+        const cursorTarget = target.closest('[data-cursor]') as HTMLElement;
+        if (!cursorTarget) return 1;
+        return cursorTarget.dataset.cursor === 'cta' ? 2 : 1.5;
+    }
+</script>

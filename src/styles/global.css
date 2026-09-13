@@ -39,3 +39,13 @@
     overflow: hidden;
   }
 }
+
+body * {
+  cursor: none;
+}
+
+@media(prefers-reduced-motion: reduce) {
+  body * {
+    cursor: auto;
+  }
+}

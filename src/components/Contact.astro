@@ -1,6 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
 import Button from './Button.astro';
+import Link from './Link.astro';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -13,13 +14,18 @@ const t = useTranslations(lang);
                 <p class='text-xs uppercase tracking-[.3em] text-accent-dim flex-1'>04 - {t('contact.contact')}</p>
                 <h2 class='text-4xl text-header font-light font-header flex-2'>{t('contact.header')}</h2>
                 <p class='text font text-text font-header flex-1'>{t('contact.subheader')}</p>
-                <a href="mailto:szymon@minko.dev" class="text-header">szymon@minko.dev</a>
+                <Link
+                    href='mailto:szymon@minko.dev'
+                    variant='inline-header'
+                    text='szymon@minko.dev'
+                />
             </div>
             <div class="flex-2">
                 <form id="form" class="flex flex-col gap-8" novalidate>
                     <div class="flex flex-col gap-4">
                         <label class="uppercase tracking-[.3em] text-xs" for="name">{t('contact.name_label')}*</label>
                         <input
+                            data-cursor="link"
                             class="border-b border-header-dim py-2 outline-none focus:border-accent text-header font-header aria-invalid:border-error user-valid:border-success"
                             required
                             type="text"
@@ -34,6 +40,7 @@ const t = useTranslations(lang);
                     <div class="flex flex-col gap-4">
                         <label class="uppercase tracking-[.3em] text-xs" for="email">{t('contact.email_label')}*</label>
                         <input
+                            data-cursor="link"
                             class="border-b border-header-dim py-2 outline-none focus:border-accent text-header font-header aria-invalid:border-error user-valid:border-success"
                             required
                             type="email"
@@ -48,6 +55,7 @@ const t = useTranslations(lang);
                     <div class="flex flex-col gap-4">
                         <label class="uppercase tracking-[.3em] text-xs" for="message">{t('contact.message_label')}*</label>
                         <textarea 
+                            data-cursor="link"
                             class="border-b border-header-dim py-2 outline-none focus:border-accent text-header font-header aria-invalid:border-error user-valid:border-success" 
                             required
                             name="message" 

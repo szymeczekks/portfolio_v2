@@ -1,5 +1,4 @@
 ---
-import ButtonV2 from '../components/ButtonV2.astro';
 import Link from '../components/Link.astro';
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
@@ -13,11 +12,23 @@ const t = useTranslations(lang);
            Copyright &copy; <span id="copyright"></span> | Szymon Mińko
         </p>
         <ul class="flex gap-5 tracking-[.3em]">
-            <li><a href="">GitHub</a></li>
-            <li><a href="">LinkedIn</a></li>
+            <li>
+                <Link
+                    href='https://github.com/szymeczekks'
+                    text='Gitbub'
+                    variant='inline'
+                />
+            </li>
+            <li>
+                <Link
+                    href='https://www.linkedin.com/in/szymon-mi%C5%84ko-710262332/'
+                    text='LinkedIn'
+                    variant='inline'
+                />
+            </li>
         </ul>
         <Link
-            href='#'
+            href='#hero'
             text={t('footer.back_to_top')}
             variant='inline'
             icon={{
