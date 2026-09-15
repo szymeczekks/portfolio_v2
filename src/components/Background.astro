@@ -130,7 +130,7 @@
 
 	function setViewportData(viewport: Viewport) {
 		if (
-			(innerHeight <= viewport.height && viewport.height - innerHeight < 100)
+			innerHeight <= viewport.height && viewport.height - innerHeight < 100 && viewport.width === innerWidth
 		) return false;
 
 		viewport.height = innerHeight;
@@ -209,7 +209,7 @@
 
 		ctx.clearRect(0, 0, viewport.width, viewport.height);
 
-		for (let i = 0; i < 320; i++) {
+		for (let i = 0; i < ((viewport.width * viewport.height / 1000) * 0.24); i++) {
 			const radius = 60 + Math.random() * 80;
 			const point = diagonalPoint(viewport, perpUnit, scatterRadius);
 			const accent = isDustInAccent();
@@ -248,7 +248,7 @@
 		const stars: Star[] = [];
 		const perpUnit = perpendicularUnit(viewport);
 		const scatterRadius = viewport.height * 0.17;
-		for (let i = 0; i < 1300; i++) {
+		for (let i = 0; i < (viewport.width * viewport.height / 1000); i++) {
 			const r = getStarRadius();
 			const point = isDiagonal() ? diagonalPoint(viewport, perpUnit, scatterRadius) : randomPoint(viewport);
 			const depth = r / MAX_STAR_RADIUS;
