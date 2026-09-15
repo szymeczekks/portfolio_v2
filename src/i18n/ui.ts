@@ -17,7 +17,7 @@ export const ui = {
         'hero.see_projects': 'Zobacz projekty',
         'hero.write_to_me': 'Napisz do mnie',
         'about_me.about_me': 'O mnie',
-        'about_me.description': '4 lata przy tworzeniu rozwiązań Webowych.',
+        'about_me.description': '4 lata przy tworzeniu rozwiązań Webowych. Swoją karierę zacząłem od prostych Landing Page\'y oraz mailingów dla jednego z największych sklepów internetowych - Media Expert. Z upływem czasu podejmowałem się coraz trudniejszych i ciekawszych projektów jak obsługa konkursów, budowa systemów automatyzujących procesy kampanijne, implementacja i wdrożenie dostępności, projektowanie i rozwój API oraz systemów backendowych. Na codzień współpracuję z klientem zbierając wymagania, proponując rozwiązania. Od niedawna postanowiłem otworzyć się na klientów zewnętrznych, dla których oferuję swoje usługi na równie wysokim poziomie.',
         'about_me.experience': 'Doświadczenie',
         'about_me.experience_value': '4 lata',
         'about_me.base': 'Baza',

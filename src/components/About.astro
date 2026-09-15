@@ -3,6 +3,17 @@ import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+function getAvailability(): string {
+    const now = new Date();
+    const quarter = Math.ceil((now.getMonth() + 1) / 3);
+    const year = now.getFullYear();
+
+    return `Q${quarter} ${year}`;
+}
+
+const availability: string = getAvailability();
+
 ---
 
 <section id="about_me" class="px-4 md:px-10 py-10 scroll-m-25">
@@ -17,12 +28,16 @@ const t = useTranslations(lang);
                     <p class="text-accent uppercase tracking-widest">
                         Stack
                     </p>
-                    <p class="mt-1 text-header">
+                    <p class="mt-1 text-header flex flex-wrap gap-y-2">
+                        <span>JavaScript (ES6+)</span>
+                        <span class="px-1">·</span>
+                        <span>TypeScript</span>
+                        <span class="px-1">·</span>
                         <span>React</span>
                         <span class="px-1">·</span>
-                        <span>TS</span>
+                        <span>Node.js</span>
                         <span class="px-1">·</span>
-                        <span>WebGL</span>
+                        <span>WordPress</span>
                     </p>
                 </div>
                 <div class="text-xs flex-1">
@@ -46,7 +61,7 @@ const t = useTranslations(lang);
                         {t('about_me.availability')}
                     </p>
                     <p class="mt-1 text-header">
-                        {t('about_me.availability_value')}
+                        {availability}
                     </p>
                 </div>
             </div>

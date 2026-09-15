@@ -169,7 +169,7 @@
 		scrollSmooth.y += (scrollTarget.y - scrollSmooth.y) * SMOOTH_FACTOR;
 
 		ctx.clearRect(0, 0, viewport.width, viewport.height);
-		ctx.globalAlpha = 0.2;
+		ctx.globalAlpha = 0.15;
 		ctx.drawImage(offscreenCanvas, 0, -(scrollSmooth.y * SCROLL_FACTOR), viewport.width, viewport.height);
 		ctx.drawImage(offscreenCanvas, 0, -(scrollSmooth.y * SCROLL_FACTOR) + viewport.height, viewport.width, viewport.height);
 		ctx.globalAlpha = 1;
