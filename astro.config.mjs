@@ -7,6 +7,9 @@ export default defineConfig({
     integrations:[icon()],
     vite: {
         plugins: [tailwindcss()],
+        build: {
+            assetsInlineLimit: 6144,
+        }
     },
     adapter: vercel(),
     i18n: {
