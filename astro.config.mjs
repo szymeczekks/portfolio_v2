@@ -25,12 +25,14 @@ export default defineConfig({
             name: "Space Grotesk",
             cssVariable: "--font-space-grotesk",
             subsets: ["latin", "latin-ext"],
+            fallbacks: ["monospace"]
         },
         {
             provider: fontProviders.fontsource(),
             name: "JetBrains Mono",
             cssVariable: "--font-jetbrains-mono",
             subsets: ["latin", "latin-ext"],
+            fallbacks: ["monospace"]
         }
     ]
 });
