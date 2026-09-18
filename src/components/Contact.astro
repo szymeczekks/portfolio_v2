@@ -1,12 +1,14 @@
     ---
-    import { getLangFromUrl, useTranslations } from '../i18n/utils';
+    import { Icon } from 'astro-icon/components';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
     import Button from './Button.astro';
     import Link from './Link.astro';
 
     export interface ContactData {
         email: string,
         name: string,
-        message: string
+        message: string,
+        consent: string,
     };
 
     const lang = getLangFromUrl(Astro.url);
@@ -72,6 +74,23 @@
                             ></textarea>
                             <p role="alert" id="error_message" class="text-xs text-error"></p>
                         </div>
+                        <label for="consent" class="flex gap-5 items-start" data-cursor="link">
+                            <input
+                                type="checkbox"
+                                name="consent"
+                                id="consent"
+                                class="hidden peer"
+                                required
+                                aria-describedby="error_consent"
+                            >
+                            <div class="border border-text w-11 flex items-center justify-center aspect-square rounded-md peer-checked:border-accent *:hidden peer-checked:*:block peer-aria-invalid:border-error">
+                                <Icon name='check' size="23"/>
+                            </div>
+                            <p>
+                                {t('contact.consent_1')} <Link href='/privacy-policy' text={t('contact.privacy_policy')} variant="inline" /> {t('contact.consent_2')}<sup>*</sup>
+                            </p>
+                        </label>
+                        <p role="alert" id="error_consent" class="text-xs text-error"></p>
                         <p id="globalMessage" class="text-text font-header"></p>
                         <div>
                             <Button
@@ -102,6 +121,7 @@
             name: Input,
             email: Input,
             message: Input,
+            consent: Input,
         };
 
         class Input {
@@ -180,13 +200,15 @@
         const name = document.querySelector<HTMLInputElement>('#name');
         const email = document.querySelector<HTMLInputElement>('#email');
         const message = document.querySelector<HTMLInputElement>('#message');
+        const consent = document.querySelector<HTMLInputElement>('#consent');
         const form: HTMLFormElement | null = document.querySelector('#form');
         const globalMessage: HTMLElement | null = document.querySelector('#globalMessage');
-        if (name && email && message && form && globalMessage) {
+        if (name && email && message && consent && form && globalMessage) {
             const inputs: Inputs = {
                 name: new Input(name),
                 email: new Input(email),
                 message: new Input(message),
+                consent: new Input(consent),
             };
         
             form?.addEventListener('submit', e => onSubmit(e, form, inputs, globalMessage));
@@ -204,7 +226,11 @@
                     firstInvalid = true;
                 }
 
-                data[input.input.name] = input.input.value;
+                if (input.input.type === 'checkbox') {
+                    data[input.input.name] = input.input.checked;
+                } else {
+                    data[input.input.name] = input.input.value;
+                }
             }
             
             if (firstInvalid) return;

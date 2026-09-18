@@ -23,15 +23,15 @@ const {
     ...rest
 } = Astro.props as Props;
 
-const commonStyles = ['cursor-pointer', 'uppercase', 'flex', 'gap-2', 'max-w-fit', 'tracking-[.1em]', textSize];
+const commonStyles = ['cursor-pointer', 'uppercase', 'gap-2', 'max-w-fit', 'tracking-[.1em]', textSize];
 const styles = {
     'border' : [
-        'border', 'px-6', 'py-3', 'rounded-full', 'border-header-dim', 'text-header',
+        'border', 'px-6', 'py-3', 'rounded-full', 'border-header-dim', 'text-header', 'flex',
         'hover:border-accent', 'hover:shadow-[0_0_20px]', 'hover:shadow-accent-dim',
         'transition-all'
     ],
-    'inline' : ['text-text', 'py-1'],
-    'inline-header' : ['text-header', 'py-1'],
+    'inline' : ['text-text', 'py-1', 'inline-flex'],
+    'inline-header' : ['text-header', 'py-1', 'inline-flex'],
 };
 const cursor: 'link' | 'cta' = variant === 'border' ? 'cta' : 'link';
 

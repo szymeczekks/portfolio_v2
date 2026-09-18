@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { escapeHTML } from "astro/runtime/server/escape.js";
 
 export interface InputError {
-    name: 'name' | 'email' | 'message',
+    name: 'name' | 'email' | 'message' | 'consent',
     message: {
         pl: string,
         en: string
@@ -17,6 +17,16 @@ export const POST: APIRoute = async ({ request }) => {
     try {
         const body: ContactData = await request.json();
         const errors: InputError[] = [];
+
+        if (!body.consent) {
+            errors.push({
+                name: 'consent',
+                message: {
+                    pl: 'Zgoda jest wymagana',
+                    en: 'Consent is required'
+                }
+            });
+        }
 
         if (!validateEmail(body.email)) {
             errors.push({

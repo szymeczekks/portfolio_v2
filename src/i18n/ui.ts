@@ -54,6 +54,9 @@ export const ui = {
         'contact.errors.valueMissing': 'To pole jest wymagane',
         'contact.required': 'To pole jest wymagane',
         'contact.submit': 'Wyślij sygnał',
+        'contact.consent_1': 'Wysyłając wiadomość, akceptuję',
+        'contact.consent_2': 'i wyrażam zgodę na przetwarzanie danych w celu odpowiedzi na zapytanie.',
+        'contact.privacy_policy': 'Politykę Prywatności',
         
     },
     en: {
@@ -67,7 +70,7 @@ export const ui = {
         'hero.see_projects': 'See projects',
         'hero.write_to_me': 'Write to me',
         'about_me.about_me': 'About me',
-        'about_me.description': 'Eight years in frontend development: from small websites to products with a million sessions a month. I feel most at home where design meets engineering—in animation, typography, and performance.',
+        'about_me.description': 'I have four years of experience developing web solutions. I began my career creating simple landing pages and email campaigns for Media Expert, one of the largest online retailers. Over time, I took on increasingly complex and engaging projects, such as managing contests, building campaign automation systems, implementing accessibility standards, and designing and developing APIs and backend systems. I work closely with clients on a daily basis to gather requirements and propose solutions. Recently, I decided to expand my services to external clients, offering them the same high standard of work.',
         'about_me.experience': 'Experience',
         'about_me.experience_value': '4 years',
         'about_me.base': 'Base',
@@ -104,5 +107,8 @@ export const ui = {
         'contact.errors.valueMissing': 'This field is required',
         'contact.required': 'This field is required',
         'contact.submit': 'Send a signal',
+        'contact.consent_1': 'By sending the message, I accept',
+        'contact.consent_2': 'and I consent to the processing of my data for the purpose of responding to the inquiry.',
+        'contact.privacy_policy': 'Privacy Policy',
     }
 } as const;

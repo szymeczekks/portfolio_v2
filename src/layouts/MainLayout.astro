@@ -1,36 +1,15 @@
 ---
-import "../styles/global.css";
 import Nav from "../components/Nav.astro";
-import Footer from "../components/Footer.astro";
-import { Font } from "astro:assets";
 import Background from "../components/Background.astro";
 import Cursor from "../components/Cursor.astro";
-
-import { getLangFromUrl, useTranslations } from "../i18n/utils";
-
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
+import BaseLayout from "./BaseLayout.astro";
+import Footer from "../components/Footer.astro";
 ---
-<!-- cursor-none motion-reduce:cursor-auto -->
-<html lang={Astro.currentLocale} class="motion-safe:scroll-smooth">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
 
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content={t('hero.description')}>
-
-		<Font cssVariable="--font-space-grotesk" />
-		<Font cssVariable="--font-jetbrains-mono" />
-		<title>Szymon Mińko</title>
-	</head>
-	<body class="bg-black text-text font-text overflow-x-hidden">
-		<Background/>
-        <Nav></Nav>
-        <slot/>
-        <Footer></Footer>
-		<Cursor/>
-	</body>
-</html>
+<BaseLayout>
+	<Background/>
+	<Nav></Nav>
+	<slot />
+	<Footer></Footer>
+	<Cursor/>
+</BaseLayout>
